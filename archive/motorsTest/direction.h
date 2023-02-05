@@ -1,9 +1,15 @@
-#ifndef __DIRECTION_H
-#define __DIRECTION_H
+#ifndef _DIRECTION_H
+#define _DIRECTION_H
 
 
-void forward(int speed) 
+void forward() 
 {
+  // MotorSpeeds 
+  analogWrite(pwmPin1,255);
+  analogWrite(pwmPin2,255);
+  analogWrite(pwmPin3,255);
+  analogWrite(pwmPin4,255);
+
   // Drive all 4 motors Forward == Forwards
   digitalWrite(motor1Pin1, LOW);
   digitalWrite(motor1Pin2, HIGH); 
@@ -18,8 +24,14 @@ void forward(int speed)
   digitalWrite(motor4Pin2, HIGH); 
 }
 
-void back(int speed) 
+void back() 
 {
+  // MotorSpeeds 
+  analogWrite(pwmPin1,255);
+  analogWrite(pwmPin2,255);
+  analogWrite(pwmPin3,255);
+  analogWrite(pwmPin4,255);
+
   // Drive all 4 motors Backward == Backwards
   digitalWrite(motor1Pin1, HIGH);
   digitalWrite(motor1Pin2, LOW); 
@@ -34,8 +46,14 @@ void back(int speed)
   digitalWrite(motor4Pin2, LOW); 
 }
 
-void left(int speed) 
+void left() 
 {
+  // MotorSpeeds 
+  analogWrite(pwmPin1,255);
+  analogWrite(pwmPin2,255);
+  analogWrite(pwmPin3,255);
+  analogWrite(pwmPin4,255);
+  
   // Drive motors 2 & 4 Forwards and 1 & 3 Backwards == Strafe Left
   digitalWrite(motor1Pin1, HIGH);
   digitalWrite(motor1Pin2, LOW); 
@@ -51,8 +69,14 @@ void left(int speed)
 
 }
 
-void right(int speed) 
+void right() 
 {
+  // MotorSpeeds 
+  analogWrite(pwmPin1,255);
+  analogWrite(pwmPin2,255);
+  analogWrite(pwmPin3,255);
+  analogWrite(pwmPin4,255);
+
   // Drive motors 1 & 3 Forwards and 2 & 4 Backwards == Strafe Right
   digitalWrite(motor1Pin1, LOW);
   digitalWrite(motor1Pin2, HIGH); 
@@ -69,6 +93,11 @@ void right(int speed)
 
 void stop()
 {
+  // MotorSpeeds 
+  analogWrite(pwmPin1,255);
+  analogWrite(pwmPin2,255);
+  analogWrite(pwmPin3,255);
+  analogWrite(pwmPin4,255);
   // STOP ALL MOTORS == Full Stop
   digitalWrite(motor1Pin1, LOW);
   digitalWrite(motor1Pin2, LOW); 
@@ -83,7 +112,7 @@ void stop()
   digitalWrite(motor4Pin2, LOW); 
 }
 
-void forwardRight(int speed) 
+void forwardRight() 
 {
   // Drive motors 1 & 3 Forwards == forward right(NE)
   digitalWrite(motor1Pin1, LOW);
@@ -99,7 +128,7 @@ void forwardRight(int speed)
   digitalWrite(motor4Pin2, LOW); 
 }
 
-void forwardLeft(int speed) 
+void forwardLeft() 
 {
   // Drive motors 2 & 4 Forwards == forward left(NW)
   digitalWrite(motor1Pin1, LOW);
@@ -115,7 +144,7 @@ void forwardLeft(int speed)
   digitalWrite(motor4Pin2, HIGH); 
 }
 
-void backwardRight(int speed) 
+void backwardRight() 
 {
   // Drive motors 2 & 4 backwards == backward right(SE)
   digitalWrite(motor1Pin1, LOW);
@@ -131,7 +160,7 @@ void backwardRight(int speed)
   digitalWrite(motor4Pin2, LOW); 
 }
 
-void backwardLeft(int speed) 
+void backwardLeft() 
 {
   // Drive motors 1 & 3 backwards == backward left(SW)
   digitalWrite(motor1Pin1, HIGH);

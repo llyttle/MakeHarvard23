@@ -117,11 +117,11 @@ void loop() {
 
 // -------------------------------------------------------------------
 
-void drive(int behavior, int rightFB int rightSpeed) 
+void drive(int rightSpeed, int leftSpeed) 
 {
-  switch (behavior) {
-    case 0: // Forward
-      // MotorSpeeds 
+  if (rightSpeed >= 0 & leftSpeed >= 0) // Forward
+  {
+    // MotorSpeeds 
       analogWrite(pwmPin1,left);
       analogWrite(pwmPin2,right);
 
@@ -130,9 +130,10 @@ void drive(int behavior, int rightFB int rightSpeed)
 
       digitalWrite(motor2Pin1, LOW);
       digitalWrite(motor2Pin2, HIGH);
-
-    case 1: // Backward
-      // MotorSpeeds 
+  }
+  else if (rightSpeed < 0 & leftSpeed < 0) // Backwards
+  {
+    // MotorSpeeds 
       analogWrite(pwmPin1,left);
       analogWrite(pwmPin2,right);
 
@@ -141,9 +142,10 @@ void drive(int behavior, int rightFB int rightSpeed)
 
       digitalWrite(motor2Pin1, HIGH);
       digitalWrite(motor2Pin2, LOW);
-      
-    case 2: // Left
-      // MotorSpeeds 
+  }
+  else if (rightSpeed >= 0 & leftSpeed < 0) // Pivot Left
+  {
+    // MotorSpeeds 
       analogWrite(pwmPin1,left);
       analogWrite(pwmPin2,right);
 
@@ -152,9 +154,10 @@ void drive(int behavior, int rightFB int rightSpeed)
 
       digitalWrite(motor2Pin1, HIGH);
       digitalWrite(motor2Pin2, LOW);
-
-    case 3: // Right
-      // MotorSpeeds 
+  }
+  else if (rightSpeed < 0 & leftSpeed >= 0) // Pivot Right
+  {
+    // MotorSpeeds 
       analogWrite(pwmPin1,left);
       analogWrite(pwmPin2,right);
 
@@ -163,9 +166,10 @@ void drive(int behavior, int rightFB int rightSpeed)
 
       digitalWrite(motor2Pin1, LOW);
       digitalWrite(motor2Pin2, HIGH);
-      
-    case 4: // STOP
-          // MotorSpeeds 
+  }
+  else if (rightSpeed = 0 & leftSpeed = 0) // STOP
+  {
+    // MotorSpeeds 
       analogWrite(pwmPin1,left);
       analogWrite(pwmPin2,right);
 
@@ -175,6 +179,18 @@ void drive(int behavior, int rightFB int rightSpeed)
       digitalWrite(motor2Pin1, LOW);
       digitalWrite(motor2Pin2, LOW);
   }
+  else {
+    // MotorSpeeds 
+      analogWrite(pwmPin1,left);
+      analogWrite(pwmPin2,right);
+
+      digitalWrite(motor1Pin1, LOW);
+      digitalWrite(motor1Pin2, LOW); 
+
+      digitalWrite(motor2Pin1, LOW);
+      digitalWrite(motor2Pin2, LOW);
+  }
+      
 }
 
 // -------------------------------------------------------------------
