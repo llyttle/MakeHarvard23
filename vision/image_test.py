@@ -7,7 +7,7 @@ import imutils
 class robotTracker():
   def __init__(self):
     # define a video capture object
-    self.vid = cv2.VideoCapture("/dev/video2")
+    self.vid = cv2.VideoCapture("/dev/video4")
 
     self.src_points = []
     self.dst_size = 480
@@ -16,7 +16,7 @@ class robotTracker():
     self.pos = None
     self.theta = None
 
-    self.recalibrate_homography(False)
+    self.recalibrate_homography(True)
 
   def recalibrate_homography(self, active):
     if active:
@@ -41,7 +41,7 @@ class robotTracker():
       print(self.src_points)
 
     else:
-      self.src_points = np.array([(114,56),(525,49),(101,477),(551,479)])
+      self.src_points = np.array([(99,25),(519,19),(92,454),(535,450)])
 
     self.h, status = cv2.findHomography(self.src_points, self.dst_points)
 
@@ -79,7 +79,7 @@ class robotTracker():
   def update(self):
     ret, frame = self.vid.read()
 
-    cv2.namedWindow('Robot Space')
+    # self.viewer.namedWindow('Robot Space')
       
     im_out = cv2.warpPerspective(frame, self.h, (self.dst_size,self.dst_size))
 
@@ -106,10 +106,10 @@ class robotTracker():
       self.pos = None
       self.theta = None
 
-    print("Position: ", self.pos)
-    print("Theta: ", self.theta)
+    # print("Position: ", self.pos)
+    # print("Theta: ", self.theta)
 
-    cv2.imshow('raw', im_out)
+    cv2.imshow('Person view', cv2.flip(im_out,1))
       
     self.windowCheck()
 
@@ -122,7 +122,110 @@ class robotTracker():
       self.vid.release()
       cv2.destroyAllWindows()
 
-if __name__ == '__main__':
-  controller = robotTracker()
+
+
+class personTracker():
+  def __init__(self):
+    min_dist_for_separate_face = 100
+    #opencv_xml_path_base = "/home/hvakil/.local/lib/python3.8/site-packages/cv2/data/"
+    #frontFaceCascade = cv2.CascadeClassifier(opencv_xml_path_base + "haarcascade_frontalface_default" + ".xml")
+    #sideFaceCascade = cv2.CascadeClassifier(opencv_xml_path_base + "haarcascade_profileface" + ".xml")
+    #upperBodyCascade = cv2.CascadeClassifier(opencv_xml_path_base + "haarcascade_upperbody" + ".xml")
+
+    ### DECLARE VIEWED IMAGE CROPPING HERE
+    self.y_min = 0
+    self.y_max = 400
+    self.x_min = 160
+    self.x_max = 505
+    self.x_range = self.x_max - self.x_min
+    self.y_range = self.y_max - self.y_min
+
+    self.pos = None  
+
+    self.video_capture = cv2.VideoCapture("/dev/video2")
+
+  def update(self):
+    #cv2.namedWindow('video_window')
+    #cv2.namedWindow('image_info')
+
+    # cv2.namedWindow('hsv_window')
+
+    # Capture frame-by-frame
+    ret, frames = self.video_capture.read()
+    #frames = cv2.resize(frames, (1500, 1000), interpolation=cv2.INTER_AREA)
+
+    sky = frames[self.y_min:self.y_max, self.x_min:self.x_max]
+    #print(f"width: {frames.get(3)}, height: {frames.get(4)}")
+    # cv2.imshow('Video2', sky)
+    hsv_image = cv2.cvtColor(sky, cv2.COLOR_BGR2HSV)
+    binary_image = cv2.inRange(sky, np.array([0,40,150]), np.array([50,100,255]))   # Color filter
+    binary_hsv = cv2.inRange(hsv_image, np.array([0, 0, 0]), np.array([255, 255, 50]))  # hsv filter
+
+    contours, _ = cv2.findContours(binary_hsv, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    try:
+      blob = max(contours, key=lambda el: cv2.contourArea(el))
+      area = cv2.contourArea(blob)    
+                  
+      if area > 100: #done with wide angle lens, ball has area of ~200 at range of ~3m
+        M = cv2.moments(blob)
+        x_mid = (M["m10"] / M["m00"])
+        y_mid = (M["m01"] / M["m00"])
+        x_frac = x_mid / self.x_range
+        y_frac = y_mid / self.y_range
+        # print(f"x mid: {x_mid}, y mid: {y_mid}")
+        # print(f"x frac: {x_frac}, y frac: {y_frac}\n")
+        center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+        goal_image_x = int(M["m10"] / M["m00"])
+
+        self.pos = np.array([x_frac, y_frac])
+
+        canvas = binary_hsv.copy()
+        cv2.circle(canvas, center, 20, (50,50,50), 5)
+        cv2.imshow('masked_window', cv2.flip(canvas, 1))
+        cv2.waitKey(5)
+
+    except:
+      self.pos = None
+   
+    # cv2.imshow('rgb window', binary_image)
+    # cv2.imshow('hsv_window', binary_hsv)
+
+    # Display the resulting frame
+    # cv2.imshow('Video', frames)
+    
+    self.windowCheck()
+
+  def windowCheck(self):
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+      self.video_capture.release()
+      cv2.destroyAllWindows()
+      print("finished successfully")
+
+class CentralController():
+  def __init__(self):
+    self.RT = robotTracker()
+    self.PT = personTracker()
+
+  
+  def spin(self):
+    self.RT.update()
+    self.PT.update()
+
+    robot_pos = self.RT.pos
+    person_pos = self.PT.pos
+
+    try:
+      target_vec = (person_pos - robot_pos)
+      rel_theta = np.arctan2(target_vec[1],target_vec[0])
+
+      print("X: ", target_vec[0])
+      print("Y: ", target_vec[1])
+      print("theta: ", self.RT.theta)
+      print("relative theta", rel_theta-self.RT.theta)
+    except:
+      print("no robot_pos or person_pos")
+
+if __name__ == "__main__":
+  CC = CentralController()
   while(True):
-    controller.update()
+    CC.spin()
