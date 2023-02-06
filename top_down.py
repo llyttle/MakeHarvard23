@@ -21,14 +21,14 @@ v_upper_bound = 50
 
 ### DECLARE VIEWED IMAGE CROPPING HERE
 y_min = 0
-y_max = 400
+y_max = 600
 x_min = 160
 x_max = 505
 x_range = x_max - x_min
 y_range = y_max - y_min
   
 
-video_capture = cv2.VideoCapture("/dev/video4")
+video_capture = cv2.VideoCapture("/dev/video6")
 
 while True:
     #cv2.namedWindow('video_window')

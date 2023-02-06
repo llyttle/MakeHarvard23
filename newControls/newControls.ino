@@ -9,7 +9,7 @@
 const byte numChars = 32;
 char receivedChars[numChars];   // an array to store the received data
 boolean newData = true;
-boolean printDebugging = true;
+boolean printDebugging = false;
 float serialInput[2]; //0: linear, 1: angular
 
 int motor1Pin1 = 4; 
